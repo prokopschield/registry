@@ -2,7 +2,7 @@ import * as J from 'doge-json';
 import { homedir } from 'node:os';
 import path from 'node:path';
 import { cacheFn } from 'ps-std/lib/functions/cacheFn';
-import { watch } from 'ts-hound';
+import Hound, { watch } from 'ts-hound';
 
 const home = path.resolve(homedir(), '.psreg');
 
@@ -35,6 +35,12 @@ export class Registry<T> implements Map<number | string, T | Promise<T>> {
 		this._datafile = path.resolve(directory, 'data.json');
 		this.load();
 	}
+	private _hound?: Hound;
+	get hound() {
+		return (this._hound ||= watch(this._datafile).on('change', (file) => {
+			this.load(file);
+		}));
+	}
 	get flat() {
 		const returnValue: { [index: string]: T } = {};
 
@@ -53,11 +59,15 @@ export class Registry<T> implements Map<number | string, T | Promise<T>> {
 			this.flat = { data };
 		}
 	}
-	load() {
-		this.flat = J.read(this._datafile);
+	load(file = this._datafile) {
+		if ((this.flat = J.read(file))) {
+			this.hound.watch(file);
+		}
 	}
 	save() {
+		this._hound?.unwatch(this._datafile);
 		J.write(this._datafile, this._state);
+		this.hound.watch(this._datafile);
 	}
 	traverse<NT = T>(relative: string): Registry<NT> {
 		return getRegistry(path.resolve(this._directory, relative));

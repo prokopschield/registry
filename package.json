@@ -1,7 +1,7 @@
 {
 	"name": "@prokopschield/registry",
 	"description": "Easy-to-use data registry for Node.js",
-	"version": "0.1.0-1",
+	"version": "0.1.0-2",
 	"main": "lib/index.js",
 	"bin": {
 		"dump-ps-registry": "lib/cli.js"
