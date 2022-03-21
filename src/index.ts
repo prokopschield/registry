@@ -1,6 +1,6 @@
 import * as J from 'doge-json';
-import { homedir } from 'node:os';
-import path from 'node:path';
+import { homedir } from 'os';
+import path from 'path';
 import { cacheFn } from 'ps-std/lib/functions/cacheFn';
 import Hound, { watch } from 'ts-hound';
 
